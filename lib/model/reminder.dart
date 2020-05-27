@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class Reminder {
   int id;
-  int pills = 0;
+  int pills ;
   String label;
   TimeOfDay timeOfDay;
 
