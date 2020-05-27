@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:MedicineReminder/model/reminder.dart';
 import 'package:MedicineReminder/pages/edit_reminder.dart';
 import 'package:MedicineReminder/services/notification_service.dart';
+import 'package:flutter_siri_suggestions/flutter_siri_suggestions.dart';
 import 'package:MedicineReminder/services/setup/services_setup.dart';
 
 void main() {
@@ -48,6 +49,40 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _initReminder();
+    initSuggestionsaddmed();
+    initSuggestions();
+  }
+
+ void initSuggestions() async {
+    FlutterSiriSuggestions.instance.buildActivity(FlutterSiriActivity(
+        "Open App 👨‍💻",
+      
+        isEligibleForSearch: true,
+        isEligibleForPrediction: true,
+        contentDescription: "Did you enjoy that?",
+        suggestedInvocationPhrase: "open my app"));
+
+    FlutterSiriSuggestions.instance.configure(
+        onLaunch: (Map<String, dynamic> message) async {
+      //Awaken from Siri Suggestion
+
+      ///// TO DO : do something!
+    });
+  }
+   void initSuggestionsaddmed() async {
+    FlutterSiriSuggestions.instance.buildActivity(FlutterSiriActivity(
+        "Open Medicine 👨‍💻",
+        isEligibleForSearch: true,
+        isEligibleForPrediction: true,
+        contentDescription: "Did you enjoy that?",
+        suggestedInvocationPhrase: "open my app"));
+
+    FlutterSiriSuggestions.instance.configure(
+        onLaunch: (Map<String, dynamic> message) async {
+      //Awaken from Siri Suggestion
+        Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
+      ///// TO DO : do something!
+    });
   }
 
   Future<void> _initReminder() async {
