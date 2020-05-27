@@ -1,3 +1,5 @@
+import 'package:MedicineReminder/services/ios.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_it/get_it.dart';
@@ -7,8 +9,15 @@ import 'package:MedicineReminder/pages/edit_reminder.dart';
 import 'package:MedicineReminder/services/notification_service.dart';
 import 'package:flutter_siri_suggestions/flutter_siri_suggestions.dart';
 import 'package:MedicineReminder/services/setup/services_setup.dart';
+import 'package:overlay_support/overlay_support.dart';
+import 'package:quick_actions/quick_actions.dart';
+
 
 void main() {
+  debugDefaultTargetPlatformOverride = TargetPlatform.android;
+
+  kNotificationSlideDuration = const Duration(milliseconds: 500);
+  kNotificationDuration = const Duration(milliseconds: 1500);
   setupServices();
   runApp(MyApp());
 }
@@ -20,7 +29,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     getIt.get<NotificationService>().init(context);
-    return MaterialApp(
+    return OverlaySupport(
+      child: MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.telexTextTheme(),
@@ -29,7 +39,7 @@ class MyApp extends StatelessWidget {
       routes: {
         MainPage.routeName: (context) => MainPage(),
         EditReminder.routeName: (context) => EditReminder(),
-      },
+      },)
     );
   }
 }
@@ -42,6 +52,8 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   List<Reminder> _reminders = [];
+    String shortcut = "no action set";
+
 
   NotificationService notificationService = getIt.get<NotificationService>();
 
@@ -51,6 +63,28 @@ class _MainPageState extends State<MainPage> {
     _initReminder();
     initSuggestionsaddmed();
     initSuggestions();
+     final QuickActions quickActions = QuickActions();
+    quickActions.initialize((String shortcutType) {
+      setState(() {
+        if (shortcutType != null) shortcut = shortcutType;
+      });
+    });
+
+    quickActions.setShortcutItems(<ShortcutItem>[
+      // NOTE: This first action icon will only work on iOS.
+      // In a real world project keep the same file name for both platforms.
+      const ShortcutItem(
+        type: 'action_one',
+        localizedTitle: 'Action one',
+        icon: 'AppIcon',
+      ),
+      // NOTE: This second action icon will only work on Android.
+      // In a real world project keep the same file name for both platforms.
+      const ShortcutItem(
+          type: 'action_two',
+          localizedTitle: 'Action two',
+          icon: 'ic_launcher'),
+    ]);
   }
 
  void initSuggestions() async {
@@ -178,7 +212,28 @@ class _MainPageState extends State<MainPage> {
                 ),
                 Expanded(
                   flex: 1,
-                  child: Text(""),
+                  child: FlatButton(child:Text("APP TEST"),
+                   onPressed: () {
+              showOverlayNotification((context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      child: SafeArea(
+        child: ListTile(
+          leading: SizedBox.fromSize(
+              size: const Size(40, 40),
+              child: Container()),
+          title: Text('FilledStacks'),
+          subtitle: Text('Thanks for checking out my tutorial'),
+          trailing: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () {
+                OverlaySupportEntry.of(context).dismiss();
+              }),
+        ),
+      ),
+    );
+  }, duration: Duration(milliseconds: 4000));
+            },),
                 ),
               ],
             ),

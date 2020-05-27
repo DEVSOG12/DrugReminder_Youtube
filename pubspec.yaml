@@ -34,6 +34,9 @@ dependencies:
   get_it: 
   uuid:
   flutter_siri_suggestions: ^1.0.1
+  quick_actions: ^0.4.0+6
+  overlay_support: ^1.0.4
+
 
 dev_dependencies:
   flutter_test:
